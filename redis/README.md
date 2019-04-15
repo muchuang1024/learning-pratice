@@ -112,7 +112,7 @@ https://github.com/gomodule/redigo
 * 运行demo
 ```
 go get github.com/gomodule/redigo
-go run keeplive.go
+go run main.go
 ```
 
 * 测试用例
