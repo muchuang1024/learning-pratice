@@ -1,3 +1,18 @@
+## 代码目录
+.
+├── README.md # 操作指南
+├── conf      # 配置文件
+│   ├── redis_6379.conf
+│   ├── redis_6380.conf
+│   ├── sentinel_26379.conf
+│   ├── sentinel_26380.conf
+│   └── sentinel_26381.conf
+├── install.sh # redis与sentinel启动脚本
+├── main.go    # demo示例
+└── redis
+    └── redis.go # redis封装库（长连接与读写分离）
+
+
 ### 准备
 
 ```
@@ -101,7 +116,7 @@ tail -f /var/log/redis-sentinel-*
 24331:X 28 Mar 2019 10:36:28.922 * +convert-to-slave slave 127.0.0.1:6379 127.0.0.1 6379 @ localmaster 127.0.0.1 6380
 ```
 
-### 长连接使用
+### 长连接与读写分离demo
 
 * 辅助库
 
