@@ -1,5 +1,5 @@
 ## 代码目录
-.
+```
 ├── README.md # 操作指南
 ├── conf      # 配置文件
 │   ├── redis_6379.conf
@@ -11,6 +11,7 @@
 ├── main.go    # demo示例
 └── redis
     └── redis.go # redis封装库（长连接与读写分离）
+```
 
 
 ### 准备
