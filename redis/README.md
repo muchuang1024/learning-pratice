@@ -1,13 +1,6 @@
 ## 代码目录
 ```
 ├── README.md # 操作指南
-├── conf      # 配置文件
-│   ├── redis_6379.conf
-│   ├── redis_6380.conf
-│   ├── sentinel_26379.conf
-│   ├── sentinel_26380.conf
-│   └── sentinel_26381.conf
-├── install.sh # redis与sentinel启动脚本
 ├── main.go    # demo示例
 └── redis
     └── redis.go # redis封装库（长连接与读写分离）
@@ -17,7 +10,8 @@
 ### 准备
 
 ```
-sh install.sh
+redis安装：see https://github.com/caijinlin/centos-dockerfile/blob/master/soft/redis/build.sh
+redis启动: see https://github.com/caijinlin/centos-dockerfile/blob/master/soft/redis/control.sh 
 ```
 
 执行命令后会启动两个redis server, master指向6379端口，slave指向6380端口，三个sentinel，监控redis master
@@ -28,21 +22,21 @@ sh install.sh
 登录master
 
 ```
-redis-cli -p 6379
+bin/redis-cli -p 6379
 ```
 
 登录slave
 
 ```
-redis-cli -p 6380
+bin/redis-cli -p 6380
 ```
 
 查看连接clients及设置
 
 ```
-redis-cli -p 6379 info clients
-redis-cli -p 6379 client list
-redis-cli -p 6379 config get maxclients
+bin/redis-cli -p 6379 info clients
+bin/redis-cli -p 6379 client list
+bin/redis-cli -p 6379 config get maxclients
 ```
 
 ### 使用sentinel
@@ -50,9 +44,9 @@ redis-cli -p 6379 config get maxclients
 登录各个sentinel
 
 ```
-redis-cli -p 26379
-redis-cli -p 26380
-redis-cli -p 26381
+bin/redis-cli -p 26379
+bin/redis-cli -p 26380
+bin/redis-cli -p 26381
 
 ```
 
@@ -72,19 +66,19 @@ master0:name=localmaster,status=ok,address=127.0.0.1:6379,slaves=1,sentinels=3
 关闭主数据库
 
 ```
-/usr/local/bin/redis-cli -p 6379 shutdown  
+bin/redis-cli -p 6379 shutdown  
 ```
 
 查看sentinel日志
 
 ```
-tail -f /var/log/redis-sentinel-*
+tail -f log/redis-sentinel-*
 ```
 
 追加了如下内容
 
 ```
-=> /var/log/redis-sentinel-26381.log <==
+=> log/redis-sentinel-26381.log <==
 24331:X 27 Mar 2019 18:33:55.121 # +promoted-slave slave 127.0.0.1:6380 127.0.0.1 6380 @ localmaster 127.0.0.1 6379
 24331:X 27 Mar 2019 18:33:55.121 # +failover-state-reconf-slaves master localmaster 127.0.0.1 6379
 24331:X 27 Mar 2019 18:33:55.191 * +slave-reconf-sent slave 172.18.0.1:6380 172.18.0.1 6380 @ localmaster 127.0.0.1 6379
@@ -93,11 +87,11 @@ tail -f /var/log/redis-sentinel-*
 24331:X 27 Mar 2019 18:33:55.193 * +slave slave 172.18.0.1:6380 172.18.0.1 6380 @ localmaster 127.0.0.1 6380
 24331:X 27 Mar 2019 18:33:55.193 * +slave slave 127.0.0.1:6379 127.0.0.1 6379 @ localmaster 127.0.0.1 6380
 
-==> /var/log/redis-sentinel-26379.log <==
+==> log/redis-sentinel-26379.log <==
 24327:X 27 Mar 2019 18:33:55.194 # +config-update-from sentinel b7d901f1775f63057bad25fdd8117f008ba25532 127.0.0.1 26381 @ localmaster 127.0.0.1 6379
 24327:X 27 Mar 2019 18:33:55.195 # +switch-master localmaster 127.0.0.1 6379 127.0.0.1 6380
 
-==> /var/log/redis-sentinel-26380.log <==
+==> log/redis-sentinel-26380.log <==
 24329:X 27 Mar 2019 18:33:55.194 # +config-update-from sentinel b7d901f1775f63057bad25fdd8117f008ba25532 127.0.0.1 26381 @ localmaster 127.0.0.1 6379
 24329:X 27 Mar 2019 18:33:55.195 # +switch-master localmaster 127.0.0.1 6379 127.0.0.1 6380
 ```
@@ -107,13 +101,13 @@ tail -f /var/log/redis-sentinel-*
 启动故障数据库
 
 ```
-/usr/local/bin/redis-server ./conf/redis_6379.conf
+bin/redis-server ./conf/redis_6379.conf
 ```
 
 查看sentinel日志，故障数据库加入slaves了
 
 ```
-==> /var/log/redis-sentinel-26381.log <==
+==> log/redis-sentinel-26381.log <==
 24331:X 28 Mar 2019 10:36:28.922 * +convert-to-slave slave 127.0.0.1:6379 127.0.0.1 6379 @ localmaster 127.0.0.1 6380
 ```
 
